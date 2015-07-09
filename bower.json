@@ -1,0 +1,22 @@
+{
+  "name": "chai-markdown",
+  "version": "0.0.0",
+  "homepage": "https://github.com/AstralMedical/chai-markdown",
+  "main": "markdown.js",
+  "authors": [
+    "danprince <dan@astraldynamics.co.uk>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.2",
+    "showdown": "~1.1.0",
+    "angular-sanitize": "~1.4.2"
+  }
+}
