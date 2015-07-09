@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app='test'>
+  <head>
+    <script src='../bower_components/angular/angular.js'></script>
+    <script src='../bower_components/angular-sanitize/angular-sanitize.js'></script>
+    <script src='../bower_components/showdown/dist/showdown.js'></script>
+    <script src='../markdown.js'></script>
+    <script>
+      angular.module('test', ['chai.markdown'])
+
+      .controller('TestController', function($scope) {
+        $scope.testCases = [
+          '[hello](http://hello.com)',
+          '__bold__',
+          '_em_',
+          '`code`'
+        ];
+      });
+    </script>
+  </head>
+  <body ng-controller='TestController'>
+    <div class='test-case' ng-repeat='case in testCases'>
+      <div chai-markdown='case'></div>
+    </div>
+  </body>
+</html>
