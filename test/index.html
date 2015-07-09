@@ -11,15 +11,15 @@
       .config(function(MarkdownTransformProvider) {
         MarkdownTransformProvider
           .pre(function(markdown) {
-            return markdown.replace('e', 'a');
+            return markdown.replace(/__/g, '_');
           });
 
         MarkdownTransformProvider
           .post(function(element) {
-            var anchors = element.find('a');
+            var ems = element.find('em');
 
-            angular.forEach(anchors, function(a) {
-              a.setAttribute('target', '_blank');
+            angular.forEach(ems, function(em) {
+              em.setAttribute('class', 'my-em-class');
             });
 
             return element;
@@ -37,6 +37,12 @@
         ];
       });
     </script>
+    <style>
+    .my-em-class {
+      color: #427420;
+      background: #92c240;
+    }
+    </style>
   </head>
   <body ng-controller='TestController'>
     <div class='test-case' ng-repeat='case in testCases'>

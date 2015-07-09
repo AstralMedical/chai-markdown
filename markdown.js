@@ -5,27 +5,32 @@ angular.module('chai.markdown', ['ngSanitize'])
  * @ngdoc provider
  * @description
  * Configurable provider for creating a middleware based transform
- * mechanism for markdown, post rendering.
+ * mechanism for markdown, before and after it is rendered..
  *
- * At configure time, the provider exposes a `.use` method that
- * takes a transform function. E.g.
+ * At configure time, the provider exposes `.pre` and `.post` methods that
+ * take transform functions as arguments.
  *
  * ```
  * MarkdownTransformProvider
  *   .pre(function(markdown) {
- *     // do some stuff, return something
+ *     // do some stuff before the markdown is rendered.
  *     return markdown;
- *   })
+ *   });
+ *
+ * MarkdownTransformProvider
  *   .post(function(element) {
- *     // do some stuff, return something else
- *     return element.find('a');
- *   })
- *   .post(function(anchors) {
+ *     // do some stuff after the markdown is rendered
+ *     var anchors = element.find('a');
  *     angular.forEach(anchors, function(a) {
  *       a.setAttribute('target', '_blank');
  *     });
+ *
+ *     return element;
  *   });
  * ```
+ *
+ * Whichever value is returned will be passed into the next step of
+ * whichever rendering path you are on (pre/post).
  */
 .provider('MarkdownTransform', function() {
   this.transforms = {

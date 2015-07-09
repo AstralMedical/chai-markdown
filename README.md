@@ -5,33 +5,43 @@ mechanism for markdown, post rendering.
 
 Works ontop of the [showdown](https://github.com/showdownjs/showdown) converter and binds markdown into an element through an attribute, similar to [btf-markdown](https://github.com/btford/angular-markdown-directive).
 
-At configure time, the provider exposes a `.use` method that
-takes a transform function. E.g.
+At configure time, the provider exposes `.pre` and `.post` methods that
+take transform functions as arguments.
 
 ```js
-.config(function(MarkdownTransformProvider) {
-  MarkdownTransformProvider
-    .use(function(element) {
-      // do some stuff, return something
-      return element;
-    })
-    .use(function(element) {
-      // do some stuff, return something else
-      return element.find('a');
-    })
-    .use(function(anchors) {
-      angular.forEach(anchors, function(a) {
-        a.setAttribute('target', '_blank');
-      });
+MarkdownTransformProvider
+  .pre(function(markdown) {
+    // do some stuff before the markdown is rendered.
+    // e.g. convert strong to emphasis
+    return markdown.replace('__', '_');
+  });
+
+MarkdownTransformProvider
+  .post(function(element) {
+    // do some stuff after the markdown is rendered
+    // e.g. give ems a class
+    var ems = element.find('em');
+
+    angular.forEach(ems, function(em) {
+      em.setAttribute(em, 'my-em-class');
     });
-});
+
+    return element;
+  });
 ```
+
+Whichever value is returned will be passed into the next step of whichever rendering path you are on (pre/post).
+
 
 Then render the markdown with the directive.
 
 ```
-<div chai-markdown='"[hello](world)"'></div>
+<div chai-markdown='"__hello__"'></div>
 ```
 
-Now all anchor tags should have `target="_blank"`.
+Which will render
+
+```
+<em class='my-em-class'>hello</em>
+```
 
