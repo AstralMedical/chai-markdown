@@ -1,14 +1,59 @@
 angular.module('chai.markdown', ['ngSanitize'])
 
-.service('MarkdownTransform', function($sanitize) {
-  this.linkTarget = function(destination, html) {
-    return html.replace(/<a /, '<a target="' + destination + '" ');
+/**
+ * @name MarkdownTransform
+ * @ngdoc provider
+ * @description
+ * Configurable provider for creating a middleware based transform
+ * mechanism for markdown, post rendering.
+ *
+ * At configure time, the provider exposes a `.use` method that
+ * takes a transform function. E.g.
+ *
+ * ```
+ * MarkdownTransformProvider
+ *   .use(function(element) {
+ *     // do some stuff, return something
+ *     return element;
+ *   })
+ *   .use(function(element) {
+ *     // do some stuff, return something else
+ *     return element.find('a');
+ *   })
+ *   .use(function(anchors) {
+ *     angular.forEach(anchors, function(a) {
+ *       a.setAttribute('target', '_blank');
+ *     });
+ *   });
+ * ```
+ */
+.provider('MarkdownTransform', function() {
+  this.transforms = [];
+
+  this.use = function(transform) {
+    this.transforms.push(transform);
+    return this;
   };
 
-  this.sanitize = $sanitize;
+  this.$get = function() {
+    return function(element) {
+      this.transforms.reduce(function(context, transform) {
+        return transform(element);
+      }, element);
+    }.bind(this);
+  };
 })
 
-.directive('chaiMarkdown', function(MarkdownTransform) {
+/**
+ * @name chaiMarkdown
+ * @ngdoc directive
+ * @description
+ * Attribute based directive which will evaluate the attribute as
+ * an expression, the convert the resulting markdown to HTML and
+ * insert it into to element.
+ */
+.directive('chaiMarkdown', ['$sanitize', 'MarkdownTransform',
+           function($sanitize, MarkdownTransform) {
   var converter = new showdown.Converter();
 
   return {
@@ -24,11 +69,13 @@ angular.module('chai.markdown', ['ngSanitize'])
         // :(
         [markdown]
           .map(converter.makeHtml)
-          .map(MarkdownTransform.linkTarget.bind(null, '_blank'))
-          .map(MarkdownTransform.sanitize)
+          .map($sanitize)
           .map(element.html.bind(element));
+
+        // pass the element into the transform middleware
+        MarkdownTransform(element);
       });
     }
   };
-});
+}]);
 

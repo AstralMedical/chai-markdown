@@ -8,12 +8,27 @@
     <script>
       angular.module('test', ['chai.markdown'])
 
+      .config(function(MarkdownTransformProvider) {
+        MarkdownTransformProvider
+          .use(function(element) {
+            var anchors = element.find('a');
+
+            angular.forEach(anchors, function(a) {
+              a.setAttribute('target', '_blank');
+            });
+
+            return element;
+          });
+      })
+
       .controller('TestController', function($scope) {
         $scope.testCases = [
           '[hello](http://hello.com)',
           '__bold__',
           '_em_',
-          '`code`'
+          '`code`',
+          'Hello [world]()',
+          '* hello [world]()'
         ];
       });
     </script>
@@ -24,3 +39,4 @@
     </div>
   </body>
 </html>
+
