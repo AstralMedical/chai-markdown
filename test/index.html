@@ -10,7 +10,12 @@
 
       .config(function(MarkdownTransformProvider) {
         MarkdownTransformProvider
-          .use(function(element) {
+          .pre(function(markdown) {
+            return markdown.replace('e', 'a');
+          });
+
+        MarkdownTransformProvider
+          .post(function(element) {
             var anchors = element.find('a');
 
             angular.forEach(anchors, function(a) {

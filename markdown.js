@@ -12,15 +12,15 @@ angular.module('chai.markdown', ['ngSanitize'])
  *
  * ```
  * MarkdownTransformProvider
- *   .use(function(element) {
+ *   .pre(function(markdown) {
  *     // do some stuff, return something
- *     return element;
+ *     return markdown;
  *   })
- *   .use(function(element) {
+ *   .post(function(element) {
  *     // do some stuff, return something else
  *     return element.find('a');
  *   })
- *   .use(function(anchors) {
+ *   .post(function(anchors) {
  *     angular.forEach(anchors, function(a) {
  *       a.setAttribute('target', '_blank');
  *     });
@@ -28,19 +28,34 @@ angular.module('chai.markdown', ['ngSanitize'])
  * ```
  */
 .provider('MarkdownTransform', function() {
-  this.transforms = [];
+  this.transforms = {
+    pre: [],
+    post: []
+  };
 
-  this.use = function(transform) {
-    this.transforms.push(transform);
+  this.pre = function(transform) {
+    this.transforms.pre.push(transform);
     return this;
   };
 
+  this.post = function(transform) {
+    this.transforms.post.push(transform);
+    return this;
+  };
+
+  function createReducer(collection) {
+    return function(initial) {
+      return collection.reduce(function(context, transform) {
+        return transform(context);
+      }, initial);
+    };
+  }
+
   this.$get = function() {
-    return function(element) {
-      this.transforms.reduce(function(context, transform) {
-        return transform(element);
-      }, element);
-    }.bind(this);
+    return {
+      pre: createReducer(this.transforms.pre),
+      post: createReducer(this.transforms.post)
+    };
   };
 })
 
@@ -65,15 +80,16 @@ angular.module('chai.markdown', ['ngSanitize'])
       scope.$watch('chaiMarkdown', function(markdown) {
         if(!markdown) return;
 
-        // this is what happens when js provides no composition operators.
-        // :(
-        [markdown]
+        // this is what happens when js provides no
+        // composition operators :(
+
+        // pre render transforms
+        [MarkdownTransform.pre(markdown)]
           .map(converter.makeHtml)
           .map($sanitize)
           .map(element.html.bind(element));
-
-        // pass the element into the transform middleware
-        MarkdownTransform(element);
+        // post render transforms
+        MarkdownTransform.post(element);
       });
     }
   };
