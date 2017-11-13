@@ -49,9 +49,9 @@ angular.module('chai.markdown', ['ngSanitize'])
   };
 
   function createReducer(collection) {
-    return function(initial) {
+    return function(initial, scope) {
       return collection.reduce(function(context, transform) {
-        return transform(context);
+        return transform(context, scope);
       }, initial);
     };
   }
@@ -72,8 +72,8 @@ angular.module('chai.markdown', ['ngSanitize'])
  * an expression, the convert the resulting markdown to HTML and
  * insert it into to element.
  */
-.directive('chaiMarkdown', ['$sanitize', 'MarkdownTransform',
-           function($sanitize, MarkdownTransform) {
+.directive('chaiMarkdown', ['$sanitize', 'MarkdownTransform', '$rootScope',
+           function($sanitize, MarkdownTransform, $rootScope) {
   var converter = new showdown.Converter();
 
   return {
@@ -89,12 +89,12 @@ angular.module('chai.markdown', ['ngSanitize'])
         // composition operators :(
 
         // pre render transforms
-        [MarkdownTransform.pre(markdown)]
+        [MarkdownTransform.pre(markdown, $rootScope)]
           .map(converter.makeHtml)
           .map($sanitize)
           .map(element.html.bind(element));
         // post render transforms
-        MarkdownTransform.post(element);
+        MarkdownTransform.post(element, $rootScope);
       });
     }
   };
