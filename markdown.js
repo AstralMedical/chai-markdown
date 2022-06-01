@@ -1,3 +1,5 @@
+import showdown from 'showdown';
+
 angular.module('chai.markdown', ['ngSanitize'])
 
 /**

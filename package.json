@@ -1,0 +1,21 @@
+{
+  "name": "chai-markdown",
+  "version": "1.0.0",
+  "description": "Configurable provider for creating a middleware based transform mechanism for markdown, before and after it is rendered",
+  "main": "markdown.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElidirHealth/chai-markdown.git"
+  },
+  "dependencies": {
+    "angular": "~1.6.3",
+    "showdown": "~1.1.0",
+    "angular-sanitize": "~1.6.3"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElidirHealth/chai-markdown/issues"
+  },
+  "homepage": "https://github.com/ElidirHealth/chai-markdown#readme"
+}
